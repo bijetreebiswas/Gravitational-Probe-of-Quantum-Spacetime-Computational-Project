@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize_scalar
 from scipy.interpolate import interp1d
 
-
 # ============================================================
 # 1.  POTENTIAL DEFINITIONS (from the paper)
 # ============================================================
@@ -52,27 +51,32 @@ def build_V_rs(qm, l, r_min=2.001, r_max=50.0, n_points=2000):
 # ============================================================
 # 2.  PROJECT 1: PLOT THE POTENTIAL (with Zeeman splitting)
 # ============================================================
-def plot_potential(l=2, qm_list=[-0.2, -0.1, 0.0, 0.1, 0.2], use_rs=True):
-    """
-    Plot V(r) or V(r_s) for multiple qm values.
-    use_rs=False plots against r (original coordinate).
-    """
+def plot_potential_vs_r(l=2, qm_list=[-0.2, -0.1, 0.0, 0.1, 0.2], r_max=20.0, r_min=2.01):
+    """Plot V(r) vs r for multiple qm values."""
     plt.figure(figsize=(8,5))
+    r_vals = np.linspace(r_min, r_max, 500)
     for qm in qm_list:
-        if use_rs:
-            V_interp, rs_vals, V_vals = build_V_rs(qm, l)
-            x = rs_vals
-            y = V_vals
-            xlabel = r'$r_s$'
-        else:
-            r_vals = np.linspace(2.01, 20, 500)
-            x = r_vals
-            y = [V_total(r, qm, l) for r in r_vals]
-            xlabel = r'$r$'
-        plt.plot(x, y, label=f'qm = {qm}')
-    plt.xlabel(xlabel)
+        V_vals = [V_total(r, qm, l) for r in r_vals]
+        plt.plot(r_vals, V_vals, label=f'qm = {qm}')
+    plt.xlabel(r'$r$')
     plt.ylabel(r'$V$')
     plt.title(f'Regge-Wheeler potential for ℓ = {l}')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+def plot_potential_zoomed(l=2, qm_list=[-0.2, -0.1, 0.0, 0.1, 0.2], r_center=3.0, width=0.4):
+    """Zoom near the peak, like Fig. 2."""
+    plt.figure(figsize=(8,5))
+    r_min = r_center - width
+    r_max = r_center + width
+    r_vals = np.linspace(r_min, r_max, 500)
+    for qm in qm_list:
+        V_vals = [V_total(r, qm, l) for r in r_vals]
+        plt.plot(r_vals, V_vals, label=f'qm = {qm}')
+    plt.xlabel(r'$r$')
+    plt.ylabel(r'$V$')
+    plt.title(f'Regge-Wheeler potential (zoomed) for ℓ = {l}')
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -80,6 +84,13 @@ def plot_potential(l=2, qm_list=[-0.2, -0.1, 0.0, 0.1, 0.2], use_rs=True):
 # ============================================================
 # 3.  PROJECT 2: TIME EVOLUTION (simplified 1D wave equation)
 # ============================================================
+def find_peak(V_interp, rs_vals):
+    """Find rs where V is maximum."""
+    res = minimize_scalar(lambda rs: -V_interp(rs),
+                          bounds=(rs_vals[0], rs_vals[-1]),
+                          method='bounded')
+    return res.x, V_interp(res.x)
+
 def time_evolution(l=2, qm=0.0, t_max=200.0, dx=0.05, cfl=0.5):
     """
     Solve the time‑dependent wave equation:
@@ -106,7 +117,7 @@ def time_evolution(l=2, qm=0.0, t_max=200.0, dx=0.05, cfl=0.5):
     # For the first step, we assume ∂ψ/∂t = 0, so psi_prev = psi - dt*0 = psi
 
     # Observer position: peak of the potential (or fixed)
-    rs_peak, _ = find_peak(V_interp, rs_vals)   # we'll define find_peak below
+    rs_peak, _ = find_peak(V_interp, rs_vals)
     idx_obs = np.argmin(np.abs(rs_grid - rs_peak))
 
     signal = []
@@ -141,13 +152,6 @@ def time_evolution(l=2, qm=0.0, t_max=200.0, dx=0.05, cfl=0.5):
 # ============================================================
 # 4.  PROJECT 3: QNM FREQUENCIES VIA 3rd‑ORDER WKB
 # ============================================================
-def find_peak(V_interp, rs_vals):
-    """Find rs where V is maximum."""
-    res = minimize_scalar(lambda rs: -V_interp(rs),
-                          bounds=(rs_vals[0], rs_vals[-1]),
-                          method='bounded')
-    return res.x, V_interp(res.x)
-
 def derivative(f, x, dx=1e-5, n=1):
     """Numerical nth derivative (n=1..4) using central differences."""
     if n == 1:
@@ -200,16 +204,18 @@ def compute_qnm_table(l=2, qm_list=[-0.2, -0.1, 0.0, 0.1, 0.2], n=0):
         print(f"{qm:5.2f}   {np.real(omega):8.5f}   { -np.imag(omega):8.5f}")
 
 # ============================================================
-# 5.  MAIN: RUN ALL THREE PROJECTS
+# 5.  MAIN: RUN ALL THREE PROJECTS (with paper‑style plots)
 # ============================================================
 if __name__ == "__main__":
-    # Project 1: Plot potential
+    # Project 1: Potential plots
     print("=== Project 1: Plotting the potential ===")
-    plot_potential(l=2, use_rs=False)    # plot against r
-    plot_potential(l=2, use_rs=True)     # plot against r_s
+    # Full range (like Fig. 1)
+    plot_potential_vs_r(l=2)
+    # Zoomed near peak (like Fig. 2)
+    plot_potential_zoomed(l=2, r_center=3.0, width=0.4)
 
-    # Project 3: QNM table
+    # Project 3: QNM frequencies
     print("\n=== Project 3: QNM frequencies ===")
     compute_qnm_table(l=2)
 
-    
+  
