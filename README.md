@@ -1,25 +1,12 @@
 # Gravitational Probe of Quantum Spacetime – Computational Projects
 
-This repository contains Python code that implements three computational projects based on the paper:
+This repository contains Python code that implements computational projects based on the paper:
 
 > N. Herceg, T. Juric, A. Samsarov, I. Smolic, K. S. Gupta  
 > *Gravitational probe of quantum spacetime*  
 > [arXiv:xxxx.xxxxx] / Physics Letters B
 
 The code computes noncommutative (quantum) corrections to the Regge‑Wheeler potential for a Schwarzschild black hole and analyses quasinormal mode (QNM) frequencies using the WKB approximation.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Projects Included](#projects-included)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Project Details](#project-details)
-- [Output Examples](#output-examples)
-- [Customisation](#customisation)
-- [References](#references)
-- [License](#license)
 
 ## Overview
 
@@ -36,13 +23,9 @@ All code is written in Python and uses only standard scientific libraries.
 ## Projects Included
 
 ### 1. Plotting the Potential (`plot_potential`)
-- Plots \(V(r)\) and \(V(r_s)\) for a range of \(qm\) values.
+- Plots \(V(r)\) for a range of \(qm\) values.
 - Reproduces the Zeeman‑like splitting shown in Figures 1 and 2 of the paper.
 
-### 2. Time Evolution (`time_evolution`)
-- Solves the 1+1 dimensional wave equation \(\partial_t^2 \psi = \partial_{r_s}^2 \psi - V(r_s) \psi\).
-- Uses a leapfrog finite‑difference scheme with absorbing boundaries.
-- Visualises the ringdown signal at the peak of the potential.
 
 ### 3. QNM Frequencies (`compute_qnm_table`)
 - Locates the maximum of the potential \(V(r_s)\).
@@ -57,5 +40,19 @@ All code is written in Python and uses only standard scientific libraries.
   - `numpy`
   - `scipy`
   - `matplotlib`
+ 
 
+## Results
 
+<img width="1023" height="674" alt="image" src="https://github.com/user-attachments/assets/85611097-b48c-4990-baad-18b5bc1619ae" />
+<img width="1007" height="674" alt="image" src="https://github.com/user-attachments/assets/453cfb8c-aef7-421d-8a20-af44e10aea27" />
+
+=== Project 3: QNM frequencies ===
+l = 2, n = 0
+qm      Re(ω)         -Im(ω)
+----------------------------------
+-0.20   326269.94280   326269.94280
+-0.10   111203.71887   -111203.71886
+ 0.00   2123.10430   -2123.10426
+ 0.10   1233.57176   -1233.57170
+ 0.20   179.07641   179.07609
